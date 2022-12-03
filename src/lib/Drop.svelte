@@ -28,7 +28,8 @@
 				filesStore.update((files) => {
 					const newFile = {
 						name: file.name,
-						cover: cover
+						cover: cover,
+						folder: false
 					};
 					return [...files, newFile];
 				});

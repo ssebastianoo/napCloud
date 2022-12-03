@@ -7,19 +7,38 @@
 
 	onMount(() => {
 		filesStore.set(files);
-
 		filesStore.subscribe((value) => {
 			if (value != files) files = value;
 		});
 	});
+
+	function getIcon(file: File) {
+		if (file.folder) return '/folder.png';
+		if (file.cover) return file.cover;
+		return '/default-file.png';
+	}
 </script>
 
+<button
+	on:click|preventDefault={() => {
+		location.href = '/drive/bruh';
+	}}>bruh</button
+>
 <div class="files">
 	{#each files as file}
-		<div class="file">
-			<p>{file.name}</p>
-			<img class="cover" src={file.cover ? file.cover : '/default-file.png'} alt={file.name} />
-		</div>
+		{#if file.folder}
+			<a href={'/drive/' + file.name}>
+				<div class="file type-folder">
+					<p>{file.name}</p>
+					<img class="cover" src={getIcon(file)} alt={file.name} />
+				</div>
+			</a>
+		{:else}
+			<div class="file type-file">
+				<p>{file.name}</p>
+				<img class="cover" src={getIcon(file)} alt={file.name} />
+			</div>
+		{/if}
 	{/each}
 </div>
 
@@ -39,6 +58,12 @@
 			overflow: hidden;
 			border: 1px solid wheat;
 
+			.cover {
+				height: 100%;
+			}
+		}
+
+		.type-file {
 			p {
 				padding: 5px;
 				margin: 0;
@@ -47,9 +72,15 @@
 				width: 100%;
 				background-color: rgba(0, 0, 0, 0.5);
 			}
+		}
 
-			.cover {
-				height: 100%;
+		.type-folder {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			p {
+				position: absolute;
 			}
 		}
 	}
