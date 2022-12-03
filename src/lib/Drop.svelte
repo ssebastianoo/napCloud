@@ -1,27 +1,39 @@
 <script lang="ts">
+	import { filesStore } from './store';
+
 	let hovering = false;
 
-	function handleDrop(e: DragEvent) {
+	async function handleDrop(e: DragEvent) {
 		hovering = false;
 		console.log(e.dataTransfer?.files);
 		if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-			// fetch('/api/upload', {
-			// 	method: 'POST',
-			// 	body: e.dataTransfer.files[0]
-			// });
+			const file = e.dataTransfer.files[0];
 
-			// senf form data
 			const formData = new FormData();
 			formData.append('file', e.dataTransfer.files[0]);
 
-			fetch('/api/upload', {
+			const res = await fetch('/api/upload', {
 				method: 'POST',
 				body: formData
-			})
-				.then((res) => res.json())
-				.then((data) => {
-					alert('File uploaded successfully');
+			});
+			const json = await res.json();
+			if (json.uploaded) {
+				let cover: string | null;
+				if (['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) {
+					cover = URL.createObjectURL(file);
+				} else {
+					cover = '/default-file.png';
+				}
+
+				filesStore.update((files) => {
+					const newFile = {
+						name: file.name,
+						cover: cover
+					};
+					return [...files, newFile];
 				});
+				alert('File uploaded!');
+			}
 		}
 	}
 </script>

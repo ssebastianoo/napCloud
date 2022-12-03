@@ -1,14 +1,20 @@
 <script lang="ts">
-	import Drop from '$lib/Drop.svelte';
-	import Files from '$lib/Files.svelte';
-	import type { PageData } from './$types';
-	export let data: PageData;
-	const files = data.files;
+	import type { File } from '$lib/utils';
+	import { filesStore } from './store';
+	import { onMount } from 'svelte';
+
+	export let files: File[];
+
+	onMount(() => {
+		filesStore.set(files);
+
+		filesStore.subscribe((value) => {
+			if (value != files) files = value;
+		});
+	});
 </script>
 
-<Drop />
-<Files {files} />
-<!-- <div class="files">
+<div class="files">
 	{#each files as file}
 		<div class="file">
 			<p>{file.name}</p>
@@ -47,4 +53,4 @@
 			}
 		}
 	}
-</style> -->
+</style>
