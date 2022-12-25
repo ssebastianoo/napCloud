@@ -8,9 +8,11 @@
 		console.log(e.dataTransfer?.files);
 		if (e.dataTransfer && e.dataTransfer.files.length > 0) {
 			const file = e.dataTransfer.files[0];
+			const filePath = window.location.pathname.replace('/drive', '').replace('~', '');
 
 			const formData = new FormData();
-			formData.append('file', e.dataTransfer.files[0]);
+			formData.append('file', file);
+			formData.append('path', filePath);
 
 			const res = await fetch('/api/upload', {
 				method: 'POST',
@@ -25,15 +27,16 @@
 					cover = '/default-file.png';
 				}
 
-				filesStore.update((files) => {
-					const newFile = {
-						name: file.name,
-						cover: cover,
-						folder: false
-					};
-					return [...files, newFile];
-				});
+				console.log(filePath);
+
+				const newFile = {
+					name: file.name,
+					cover: cover,
+					folder: false,
+					path: filePath + '/' + file.name
+				};
 				alert('File uploaded!');
+				$filesStore = [...$filesStore, newFile];
 			}
 		}
 	}

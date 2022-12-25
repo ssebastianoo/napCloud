@@ -1,13 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import type { File } from '$lib/utils';
+import { PUBLIC_STORE_PATH } from '$env/static/public';
 
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params }) => {
 	const filename = params.filename === `~` ? '' : params.filename;
-	const pathString = path.join('./src/files', filename);
+	const pathString = path.join(PUBLIC_STORE_PATH, filename);
 
 	const filesList = fs.readdirSync(pathString);
+
 	const files: File[] = [];
 
 	for (const file of filesList) {
@@ -33,7 +35,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		files.push({
 			name: file,
 			cover: cover,
-			folder: folder
+			folder: folder,
+			path: path.join(filename, file)
 		});
 	}
 
