@@ -3,41 +3,42 @@
 
 	let hovering = false;
 
-	async function handleDrop(e: DragEvent) {
-		hovering = false;
-		console.log(e.dataTransfer?.files);
-		if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-			const file = e.dataTransfer.files[0];
-			const filePath = window.location.pathname.replace('/drive', '').replace('~', '');
-
-			const formData = new FormData();
+	async function upload(files: FileList) {
+		const filePath = window.location.pathname.replace('/drive', '').replace('~', '');
+		const formData = new FormData();
+		for (const file of files) {
 			formData.append('file', file);
-			formData.append('path', filePath);
+		}
+		formData.append('path', filePath);
 
-			const res = await fetch('/api/upload', {
-				method: 'POST',
-				body: formData
-			});
-			const json = await res.json();
-			if (json.uploaded) {
-				let cover: string | null;
-				if (['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) {
-					cover = URL.createObjectURL(file);
-				} else {
-					cover = '/default-file.png';
-				}
-
-				console.log(filePath);
-
+		const res = await fetch('/api/upload', {
+			method: 'POST',
+			body: formData
+		});
+		const json = await res.json();
+		if (json.uploaded) {
+			for (const file of files) {
 				const newFile = {
 					name: file.name,
-					cover: cover,
 					folder: false,
 					path: filePath + '/' + file.name
 				};
 				alert('File uploaded!');
 				$filesStore = [...$filesStore, newFile];
 			}
+		}
+	}
+
+	async function handleFilesAdd(e: Event) {
+		const target = e.target as HTMLInputElement;
+		if (target.files) await upload(target.files);
+	}
+
+	async function handleDrop(e: DragEvent) {
+		hovering = false;
+		if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+			const files = e.dataTransfer.files;
+			await upload(files);
 		}
 	}
 </script>
@@ -51,6 +52,11 @@
 	<p>Drop files here</p>
 </div>
 
+<div class="drop">
+	<label for="upload">Or click here</label>
+	<input id="upload" type="file" multiple on:change={handleFilesAdd} />
+</div>
+
 <style lang="scss">
 	.drop {
 		width: 100%;
@@ -60,6 +66,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex-direction: column;
 		margin-bottom: 20px;
 
 		p {

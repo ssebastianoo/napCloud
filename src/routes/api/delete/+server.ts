@@ -9,12 +9,24 @@ export const DELETE: RequestHandler = async ({ request }) => {
 	const filePath = data.path;
 
 	if (!filePath) return json({ deleted: false });
-	fs.unlink(path.join(PUBLIC_STORE_PATH, filePath), (err) => {
-		if (err) {
-			console.error(err);
-			return json({ deleted: false });
-		}
-	});
+	const fullPath = path.join(PUBLIC_STORE_PATH, filePath);
+
+	const stat = fs.lstatSync(fullPath);
+	if (!stat.isDirectory()) {
+		fs.unlink(path.join(PUBLIC_STORE_PATH, filePath), (err) => {
+			if (err) {
+				console.error(err);
+				return json({ deleted: false });
+			}
+		});
+	} else {
+		fs.rmdir(path.join(PUBLIC_STORE_PATH, filePath), { recursive: true }, (err) => {
+			if (err) {
+				console.error(err);
+				return json({ deleted: false });
+			}
+		});
+	}
 
 	return json({ deleted: true });
 };

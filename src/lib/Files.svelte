@@ -14,7 +14,10 @@
 
 	function getIcon(file: File) {
 		if (file.folder) return '/folder.png';
-		if (file.cover) return file.cover;
+		const ext = file.name.split('.').pop();
+		if (ext && ['png', 'jpg', 'jpeg'].includes(ext.toLowerCase())) {
+			return `/file/${file.path}`;
+		}
 		return '/default-file.png';
 	}
 
