@@ -1,6 +1,7 @@
 import type { Actions } from './$types';
 import { createUser, verifyUser } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
+import { SECRET_DISABLE_NEW_USERS } from '$env/static/private';
 
 export const actions: Actions = {
 	login: async ({ request, cookies }) => {
@@ -29,6 +30,12 @@ export const actions: Actions = {
 		}
 	},
 	register: async ({ request, cookies }) => {
+		if (SECRET_DISABLE_NEW_USERS.toLocaleLowerCase() === 'true') {
+			return {
+				success: false,
+				error: 'New users are disabled'
+			};
+		}
 		const data = await request.formData();
 		const email = data.get('email')?.toString();
 		const password = data.get('password')?.toString();
