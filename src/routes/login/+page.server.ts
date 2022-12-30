@@ -2,6 +2,17 @@ import type { Actions } from './$types';
 import { createUser, verifyUser } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 import { SECRET_DISABLE_NEW_USERS } from '$env/static/private';
+import { PUBLIC_ALLOW_HTTP } from '$env/static/public';
+import type { Cookies } from '@sveltejs/kit';
+
+function setToken(token: string, cookies: Cookies) {
+	let secure = true;
+	if (PUBLIC_ALLOW_HTTP.toLocaleLowerCase() === 'true') secure = false;
+	cookies.set('sessionid', token, {
+		expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+		secure
+	});
+}
 
 export const actions: Actions = {
 	login: async ({ request, cookies }) => {
@@ -17,10 +28,7 @@ export const actions: Actions = {
 					error
 				};
 			}
-			if (token)
-				cookies.set('sessionid', token, {
-					expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
-				});
+			if (token) setToken(token, cookies);
 			throw redirect(303, '/');
 		} else {
 			return {
@@ -43,10 +51,7 @@ export const actions: Actions = {
 		if (email && password) {
 			const { success, error, token } = await createUser(email, password);
 			if (success) {
-				if (token)
-					cookies.set('sessionid', token, {
-						expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
-					});
+				if (token) setToken(token, cookies);
 				throw redirect(303, '/');
 			} else {
 				return {

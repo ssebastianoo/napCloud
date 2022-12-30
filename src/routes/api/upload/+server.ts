@@ -3,8 +3,13 @@ import type { RequestHandler } from './$types';
 import path from 'path';
 import fs from 'fs';
 import { PUBLIC_STORE_PATH } from '$env/static/public';
+import { checkToken } from '$lib/server/db';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
+	const sessionid = cookies.get('sessionid');
+	const { success } = await checkToken(sessionid);
+	if (!success) return new Response('Unauthorized', { status: 401 });
+
 	const data = await request.formData();
 	const files = data.getAll('file') as File[];
 	const filePath = data.get('path') as string;

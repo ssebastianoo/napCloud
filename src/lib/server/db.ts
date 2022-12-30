@@ -85,7 +85,14 @@ export async function verifyUser(email: string, password: string) {
 	};
 }
 
-export async function checkToken(sessionid: string) {
+export async function checkToken(sessionid: string | undefined) {
+	if (!sessionid) {
+		return {
+			success: false,
+			error: 'Invalid session'
+		};
+	}
+
 	await checkDB();
 	const session = await db.get('SELECT * FROM sessions WHERE id = ?', sessionid);
 	if (!session || session.expires < Date.now())

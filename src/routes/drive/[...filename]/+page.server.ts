@@ -8,7 +8,6 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const sessionid = cookies.get('sessionid');
-	if (!sessionid) throw redirect(303, '/login');
 	const { success } = await checkToken(sessionid);
 	if (!success) throw redirect(303, '/login');
 

@@ -6,7 +6,6 @@ import { checkToken } from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
 	const sessionid = cookies.get('sessionid');
-	if (!sessionid) return new Response('Unauthorized', { status: 401 });
 	const { success } = await checkToken(sessionid);
 	if (!success) return new Response('Unauthorized', { status: 401 });
 	const file = fs.readFileSync(path.join(PUBLIC_STORE_PATH, params.filename));
