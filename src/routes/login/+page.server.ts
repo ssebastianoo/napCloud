@@ -38,7 +38,7 @@ export const actions: Actions = {
 		}
 	},
 	register: async ({ request, cookies }) => {
-		if (SECRET_DISABLE_NEW_USERS.toLocaleLowerCase() === 'true') {
+		if (SECRET_DISABLE_NEW_USERS.toLowerCase() === 'true') {
 			return {
 				success: false,
 				error: 'New users are disabled'
