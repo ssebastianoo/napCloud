@@ -21,7 +21,7 @@
 				const newFile = {
 					name: file.name,
 					folder: false,
-					path: filePath + '/' + file.name
+					path: (filePath + '/' + file.name).replaceAll('//', '/')
 				};
 				alert('File uploaded!');
 				$filesStore = [...$filesStore, newFile];

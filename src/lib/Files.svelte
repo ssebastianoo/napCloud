@@ -2,6 +2,7 @@
 	import type { File } from '$lib/utils';
 	import { filesStore, contextMenu } from './store';
 	import { onMount } from 'svelte';
+	import CreateFolder from '$lib/CreateFolder.svelte';
 
 	export let files: File[];
 
@@ -22,8 +23,8 @@
 	}
 
 	function handleClick(file: File) {
-		if (file.folder) window.location.href = `/drive/${file.path}`;
-		else window.open(`/file/${file.path}`, '_blank');
+		if (file.folder) window.location.href = `/drive/${file.path}`.replaceAll('//', '/');
+		else window.open(`/file/${file.path}`.replaceAll('//', '/'), '_blank');
 	}
 
 	export function clickOutside(node: any) {
@@ -44,6 +45,7 @@
 	}
 </script>
 
+<CreateFolder />
 <div class="files">
 	{#each files as file}
 		<div
@@ -55,16 +57,14 @@
 					file: file.path
 				};
 			}}
-			on:click={() => {
+			class={'file ' + (file.folder ? 'type-folder' : 'type-file')}
+			on:click|preventDefault={() => {
 				$contextMenu = {
 					x: 0,
 					y: 0,
 					show: false,
 					file: ''
 				};
-			}}
-			class={'file ' + (file.folder ? 'type-folder' : 'type-file')}
-			on:click|preventDefault={() => {
 				handleClick(file);
 			}}
 			on:keypress|preventDefault
