@@ -13,7 +13,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const data = await request.formData();
 	const files = data.getAll('file') as File[];
 	const filePath = data.get('path') as string;
-	console.log(files);
 	if (files) {
 		for (const file of files) {
 			const buffer = Buffer.from(await file.arrayBuffer());

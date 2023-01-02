@@ -7,6 +7,7 @@
 		const filePath = window.location.pathname.replace('/drive', '').replace('~', '');
 		const formData = new FormData();
 		for (const file of files) {
+			console.log(file);
 			formData.append('file', file);
 		}
 		formData.append('path', filePath);

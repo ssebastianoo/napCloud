@@ -15,3 +15,4 @@ export const contextMenu = writable(<ContextMenu>{
 	y: 0,
 	file: ''
 });
+export const filesVisibility = writable<{ [key: string]: boolean }>({});

@@ -18,6 +18,9 @@ async function checkDB() {
 		await db.run(
 			'CREATE TABLE IF NOT EXISTS sessions (id TEXT NOT NULL UNIQUE, user TEXT PRIMARY KEY, expires INTEGER NOT NULL);'
 		);
+		await db.run(
+			'CREATE TABLE IF NOT EXISTS files (path TEXT NOT NULL UNIQUE, visible BOOLEAN DEFAULT 0);'
+		);
 	}
 }
 
@@ -104,4 +107,32 @@ export async function checkToken(sessionid: string | undefined) {
 		success: true,
 		user: session.user
 	};
+}
+
+function checkFilePath(filePath: string) {
+	filePath = filePath.replaceAll('//', '/');
+	if (filePath.endsWith('/')) filePath = filePath.slice(0, -1);
+	if (!filePath.startsWith('/')) filePath = '/' + filePath;
+	return filePath;
+}
+
+export async function setFileVisibility(filePath: string, visible: boolean) {
+	await checkDB();
+	const _visible = visible === true ? 1 : 0;
+	filePath = checkFilePath(filePath);
+	await db.run(
+		'INSERT INTO files (path, visible) VALUES (?, ?) ON CONFLICT (path) DO UPDATE SET visible=? WHERE path=?',
+		filePath,
+		_visible,
+		_visible,
+		filePath
+	);
+}
+
+export async function isFilePublic(filePath: string) {
+	await checkDB();
+	filePath = checkFilePath(filePath);
+	const file = await db.get('SELECT * FROM files WHERE path = ?', filePath);
+	if (file && file.visible === 1) return true;
+	return false;
 }

@@ -59,12 +59,6 @@
 			}}
 			class={'file ' + (file.folder ? 'type-folder' : 'type-file')}
 			on:click|preventDefault={() => {
-				$contextMenu = {
-					x: 0,
-					y: 0,
-					show: false,
-					file: ''
-				};
 				handleClick(file);
 			}}
 			on:keypress|preventDefault
